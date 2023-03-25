@@ -115,12 +115,12 @@ def video_detect(
 ):
     try:
         if 'fps' in ffmpeg_config:
-            reader: imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath, fps=ffmpeg_config['fps'])
+            reader: cv2.VideoCapture(2) #imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath, fps=ffmpeg_config['fps'])
         else:
-            reader: imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath)
+            reader: cv2.VideoCapture(2) #imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath)
 
-        meta = reader.get_meta_data()
-        _ = meta['size']
+        #meta = reader.get_meta_data()
+        #_ = meta['size']
     except:
         if cam:
             print(f'Could not find video device {ipath}. Please set a valid input.')
@@ -130,7 +130,8 @@ def video_detect(
 
     if cam:
         nframes = None
-        read_iter = cam_read_iter(reader)
+        #read_iter = cam_read_iter(reader)
+        ret, read_iter = read(reader)
     else:
         read_iter = reader.iter_data()
         nframes = reader.count_frames()
@@ -143,7 +144,7 @@ def video_detect(
         _ffmpeg_config = ffmpeg_config.copy()
         if not 'fps' in _ffmpeg_config:
             #  If fps is not explicitly set in ffmpeg_config, use source video fps value
-            _ffmpeg_config['fps'] = meta['fps']
+            _ffmpeg_config['fps'] = 15 # meta['fps']
         ## writer: imageio.plugins.ffmpeg.FfmpegFormat.Writer = imageio.get_writer(
         ##    opath, format='FFMPEG', mode='I', **_ffmpeg_config
         ##)
@@ -171,8 +172,8 @@ def video_detect(
                 cv2.destroyAllWindows()
                 break
         bar.update()
-    #writer.release()
-    reader.close()
+    #reader.close()
+    reader.release()
     if opath is not None:
         writer.release()
     bar.close()
