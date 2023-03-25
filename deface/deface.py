@@ -167,7 +167,8 @@ def video_detect(
            writer.write(frame)
 
         if enable_preview:
-            cv2.imshow('Preview of anonymization results (quit by pressing Q or Escape)', frame[:, :, ::-1])  # RGB -> RGB
+            #cv2.imshow('Preview of anonymization results (quit by pressing Q or Escape)', frame[:, :, ::-1])  # RGB -> RGB
+            cv2.imshow('Preview of anonymization results (quit by pressing Q or Escape)', frame)  # RGB -> RGB
             if cv2.waitKey(1) & 0xFF in [ord('q'), 27]:  # 27 is the escape key code
                 cv2.destroyAllWindows()
                 break
