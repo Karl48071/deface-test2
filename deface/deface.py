@@ -144,9 +144,12 @@ def video_detect(
         if not 'fps' in _ffmpeg_config:
             #  If fps is not explicitly set in ffmpeg_config, use source video fps value
             _ffmpeg_config['fps'] = meta['fps']
-        writer: imageio.plugins.ffmpeg.FfmpegFormat.Writer = imageio.get_writer(
-            opath, format='FFMPEG', mode='I', **_ffmpeg_config
-        )
+        ## writer: imageio.plugins.ffmpeg.FfmpegFormat.Writer = imageio.get_writer(
+        ##    opath, format='FFMPEG', mode='I', **_ffmpeg_config
+        ##)
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        fps = 15
+        writer = cv2.VideoWriter(opath, fourcc, fps, (848,480))
 
     for frame in read_iter:
         # Perform network inference, get bb dets but discard landmark predictions
@@ -159,7 +162,8 @@ def video_detect(
         )
 
         if opath is not None:
-            writer.append_data(frame)
+           # writer.append_data(frame)
+           writer.write(frame)
 
         if enable_preview:
             cv2.imshow('Preview of anonymization results (quit by pressing Q or Escape)', frame[:, :, ::-1])  # RGB -> RGB
@@ -167,6 +171,7 @@ def video_detect(
                 cv2.destroyAllWindows()
                 break
         bar.update()
+    writer.release()
     reader.close()
     if opath is not None:
         writer.close()
