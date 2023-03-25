@@ -114,8 +114,9 @@ def video_detect(
         replaceimg = None
 ):
     reader = cv2.VideoCapture(2)
-    fps = reader.get(cv2.CAP_PROP_FPS)
-    frame_size = (int(reader.get(cv2.CAP_PROP_FRAME_WIDTH)), int(reader.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+    #fps = reader.get(cv2.CAP_PROP_FPS)
+    #frame_size = (int(reader.get(cv2.CAP_PROP_FRAME_WIDTH)), int(reader.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+    fps = 20
         
     # try:
     #     if 'fps' in ffmpeg_config:
@@ -156,8 +157,8 @@ def video_detect(
 
     while True:
         ret, frame = reader.read()
-        if not ret:
-            break
+        #if not ret:
+        #    break
         # Convert the frame to RGB
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         #Perform network inference, get bb dets but discard landmark predictions
