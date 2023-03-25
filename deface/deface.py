@@ -113,25 +113,28 @@ def video_detect(
         ffmpeg_config: Dict[str, str],
         replaceimg = None
 ):
-    try:
-        if 'fps' in ffmpeg_config:
-            reader = cv2.VideoCapture(2) #imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath, fps=ffmpeg_config['fps'])
-        else:
-            reader = cv2.VideoCapture(2) #imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath)
+    reader = cv2.VideoCapture(2)
+    fps = reader.get(cv2.CAP_PROP_FPS)
+    frame_size = (int(reader.get(cv2.CAP_PROP_FRAME_WIDTH)), int(reader.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+        
+    # try:
+    #     if 'fps' in ffmpeg_config:
+    #         reader = cv2.VideoCapture(2) #imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath, fps=ffmpeg_config['fps'])
+    #     else:
+    #         reader = cv2.VideoCapture(2) #imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath)
 
-        #meta = reader.get_meta_data()
-        #_ = meta['size']
-    except:
-        if cam:
-            print(f'Could not find video device {ipath}. Please set a valid input.')
-        else:
-            print(f'Could not open file {ipath} as a video file with imageio. Skipping file...')
-        return
+    #     #meta = reader.get_meta_data()
+    #     #_ = meta['size']
+    # except:
+    #     if cam:
+    #         print(f'Could not find video device {ipath}. Please set a valid input.')
+    #     else:
+    #         print(f'Could not open file {ipath} as a video file with imageio. Skipping file...')
+    #     return
 
     if cam:
         nframes = None
         #read_iter = cam_read_iter(reader)
-        ret, read_iter = reader.read()
     else:
         read_iter = reader.iter_data()
         nframes = reader.count_frames()
@@ -152,8 +155,13 @@ def video_detect(
         fps = 15
         writer = cv2.VideoWriter(opath, fourcc, fps, (848,480),True)
 
-    for frame in read_iter:
-        # Perform network inference, get bb dets but discard landmark predictions
+    while True:
+        ret, frame = reader.read()
+        if not ret:
+            break
+        # Convert the frame to RGB
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        #Perform network inference, get bb dets but discard landmark predictions
         dets, _ = centerface(frame, threshold=threshold)
 
         anonymize_frame(
@@ -161,22 +169,43 @@ def video_detect(
             replacewith=replacewith, ellipse=ellipse, draw_scores=draw_scores,
             replaceimg=replaceimg
         )
+        # Write the processed frame to the output video
+        writer.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
 
-        if opath is not None:
-           # writer.append_data(frame)
-           writer.write(frame)
-
+        # Optionally show the processed frame in a window
         if enable_preview:
-            #cv2.imshow('Preview of anonymization results (quit by pressing Q or Escape)', frame[:, :, ::-1])  # RGB -> RGB
-            cv2.imshow('Preview of anonymization results (quit by pressing Q or Escape)', frame)  # RGB -> RGB
-            if cv2.waitKey(1) & 0xFF in [ord('q'), 27]:  # 27 is the escape key code
-                cv2.destroyAllWindows()
+            cv2.imshow('Preview (quit by pressing Q or Escape)', cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+            if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-        bar.update()
-    #reader.close()
     reader.release()
-    if opath is not None:
-        writer.release()
+    writer.release()
+    cv2.destroyAllWindows()
+
+    # for frame in read_iter:
+    #     # Perform network inference, get bb dets but discard landmark predictions
+    #     dets, _ = centerface(frame, threshold=threshold)
+
+    #     anonymize_frame(
+    #         dets, frame, mask_scale=mask_scale,
+    #         replacewith=replacewith, ellipse=ellipse, draw_scores=draw_scores,
+    #         replaceimg=replaceimg
+    #     )
+
+    #     if opath is not None:
+    #        # writer.append_data(frame)
+    #        writer.write(frame)
+
+    #     if enable_preview:
+    #         #cv2.imshow('Preview of anonymization results (quit by pressing Q or Escape)', frame[:, :, ::-1])  # RGB -> RGB
+    #         cv2.imshow('Preview of anonymization results (quit by pressing Q or Escape)', frame)  # RGB -> RGB
+    #         if cv2.waitKey(1) & 0xFF in [ord('q'), 27]:  # 27 is the escape key code
+    #             cv2.destroyAllWindows()
+    #             break
+    #     bar.update()
+    #reader.close()
+    # reader.release()
+    # if opath is not None:
+    #     writer.release()
     bar.close()
 
 
