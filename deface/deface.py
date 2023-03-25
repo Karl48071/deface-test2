@@ -115,9 +115,9 @@ def video_detect(
 ):
     try:
         if 'fps' in ffmpeg_config:
-            reader: cv2.VideoCapture(2) #imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath, fps=ffmpeg_config['fps'])
+            reader = cv2.VideoCapture(2) #imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath, fps=ffmpeg_config['fps'])
         else:
-            reader: cv2.VideoCapture(2) #imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath)
+            reader = cv2.VideoCapture(2) #imageio.plugins.ffmpeg.FfmpegFormat.Reader = imageio.get_reader(ipath)
 
         #meta = reader.get_meta_data()
         #_ = meta['size']
