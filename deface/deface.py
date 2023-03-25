@@ -131,7 +131,7 @@ def video_detect(
     if cam:
         nframes = None
         #read_iter = cam_read_iter(reader)
-        ret, read_iter = read(reader)
+        ret, read_iter = reader.read()
     else:
         read_iter = reader.iter_data()
         nframes = reader.count_frames()
