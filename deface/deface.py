@@ -152,7 +152,6 @@ def video_detect(
         ##    opath, format='FFMPEG', mode='I', **_ffmpeg_config
         ##)
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        fps = 15
         writer = cv2.VideoWriter(opath, fourcc, fps, (848,480),True)
 
     while True:
@@ -177,6 +176,7 @@ def video_detect(
             cv2.imshow('Preview (quit by pressing Q or Escape)', cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+        bar.update()
     reader.release()
     writer.release()
     cv2.destroyAllWindows()
