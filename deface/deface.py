@@ -114,9 +114,10 @@ def video_detect(
         replaceimg = None
 ):
     reader = cv2.VideoCapture(2)
+    reader.set(cv2.CAP_PROP_BUFFERSIZE, 2)
     #fps = reader.get(cv2.CAP_PROP_FPS)
     #frame_size = (int(reader.get(cv2.CAP_PROP_FRAME_WIDTH)), int(reader.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-    fps = 20
+    fps = 30
         
     # try:
     #     if 'fps' in ffmpeg_config:
