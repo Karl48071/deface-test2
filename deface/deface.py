@@ -149,7 +149,7 @@ def video_detect(
         ##)
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         fps = 15
-        writer = cv2.VideoWriter(opath, fourcc, fps, (848,480))
+        writer = cv2.VideoWriter(opath, fourcc, fps, (848,480),True)
 
     for frame in read_iter:
         # Perform network inference, get bb dets but discard landmark predictions
@@ -171,10 +171,10 @@ def video_detect(
                 cv2.destroyAllWindows()
                 break
         bar.update()
-    writer.release()
+    #writer.release()
     reader.close()
     if opath is not None:
-        writer.close()
+        writer.release()
     bar.close()
 
 
